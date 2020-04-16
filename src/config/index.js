@@ -1,7 +1,7 @@
 const config = {
   app: {
-    domain: 'http://localhost:3000',
-    port: 3000,
+    domain: 'http://122.51.67.38:3500',
+    port: 3500,
     staticPath: `${process.cwd()}/static`
   },
   dataBase: {
