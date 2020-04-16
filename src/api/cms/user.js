@@ -98,4 +98,8 @@ router.delete('/adduser', async ctx=>{
     });
 })
 
+router.get('/test', async ctx=>{
+    ctx.body = 'hi test'
+})
+
 module.exports = router;
