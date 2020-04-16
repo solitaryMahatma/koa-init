@@ -1,4 +1,5 @@
 const Router = require('koa-router');
+const bcrypt = require('bcryptjs');
 const { CmsUser } = require('../../models/cmsUser');
 const { AddUser } = require('../../models/adduser')
 const {Token} = require('../../core/token')
@@ -8,14 +9,21 @@ const router = new Router({
 });
 
 router.post('/login', async ctx => {
+    console.log(ctx.request.body);
     
     ctx.check('userName', '用户名长度5-9个字符').isLength({ max: 9, min: 5 })
     ctx.check('password', '只支持长度为6-18的数字、字母、下划线组合').matches(/^(\w){6,18}$/)
     const _data = await ctx.valid()
-    const {userName} = _data
-    const _user = await CmsUser.findOne({where:{userName}})
-    if (_userName) {
-        const corrPwd = bcrypt.compareSync(userName, _user.userName);
+    const {userName, password, id,avatar, nickName,admin,email} = _data
+    console.log(userName);
+    
+    const _user = await CmsUser.findOne({where:{userName: userName}})
+    console.log(JSON.stringify(_user));
+    
+    if (_user) {
+        console.log(1);
+        
+        const corrPwd = bcrypt.compareSync(password, _user.password);
         if (!corrPwd) {
             throw new global.Ex.Fail({
                 errCode: 20200,
@@ -23,6 +31,7 @@ router.post('/login', async ctx => {
             }) 
         }
     } else {
+        console.log(12);
         throw new global.Ex.Fail({
             errCode: 20000,
             errMsg: "用户不存在"
@@ -31,13 +40,14 @@ router.post('/login', async ctx => {
     const {id} = _user
     const signToken = token.sign({id})
     ctx.json({
+        userInfo: {userName, password, id,avatar, nickName,admin,email},
         token: signToken,
         errMsg: '登录成功!'
     })
 });
 
 router.post('/register', async ctx => {
-    ctx.check('userName', '用户名长度5-9个字符').isLength({ max: 9, min: 5 })
+    ctx.check('userName', '用户名长度5-9个字符').isLength({ max: 9, min: 4 })
     ctx.check('password', '只支持长度为6-18的数字、字母、下划线组合').matches(/^(\w){6,18}$/)
     const _data = await ctx.valid()
     const {userName} = _data
